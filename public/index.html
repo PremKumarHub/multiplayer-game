@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        button { padding: 10px 20px; font-size: 20px; cursor: pointer; }
+        #scores { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Multiplayer Click Race</h1>
+    <p>Click the button to score points!</p>
+    <button id="clickButton">Click Me!</button>
+    <div id="scores"></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script >
+        const socket = io();
+
+// Get the button and scores container
+const clickButton = document.getElementById('clickButton');
+const scoresDiv = document.getElementById('scores');
+
+// Handle button click
+clickButton.addEventListener('click', () => {
+    socket.emit('player-click');
+});
+
+// Update scores on the UI
+socket.on('update-scores', (scores) => {
+    scoresDiv.innerHTML = '<h2>Scores:</h2>';
+    for (const [playerId, score] of Object.entries(scores)) {
+        scoresDiv.innerHTML += `<p>${playerId}: ${score}</p>`;
+    }
+});
+
+// Handle game over
+socket.on('game-over', (winnerId) => {
+    alert(`Game Over! Player ${winnerId} wins!`);
+    socket.disconnect();
+});
+
+    </script>
+</body>
+</html>
